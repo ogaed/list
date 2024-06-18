@@ -12,6 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Test"
         tools:targetApi="31">
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -23,6 +24,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Add CategoryDetailsActivity here -->
+        <activity
+            android:name=".CategoryDetailsActivity"
+            android:exported="true"
+            android:label="Category Details"
+            android:theme="@style/Theme.Test" />
+
     </application>
 
 </manifest>
