@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- nav_graph.xml -->
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/navigation_home">
+
+    <!-- Home navigation graph -->
+    <navigation
+        android:id="@+id/navigation_home"
+        app:startDestination="@id/homeFragment">
+
+        <fragment
+            android:id="@+id/homeFragment"
+            android:name="com.example.test.ui.HomeFragment"
+            android:label="Home"
+            tools:layout="@layout/fragment_home" />
+
+        <!-- Add more destinations for Home tab if needed -->
+    </navigation>
+
+    <!-- All Tourist Attractions navigation graph -->
+    <navigation
+        android:id="@+id/navigation_all_attractions"
+        app:startDestination="@id/allAttractionsFragment">
+
+        <fragment
+            android:id="@+id/allAttractionsFragment"
+            android:name="com.example.test.ui.AllAttractionsFragment"
+            android:label="All Tourist Attractions"
+            tools:layout="@layout/fragment_all_attractions" />
+
+        <!-- Add more destinations for All Tourist Attractions tab if needed -->
+    </navigation>
+
+    <!-- Contact Us navigation graph -->
+    <navigation
+        android:id="@+id/navigation_contact_us"
+        app:startDestination="@id/contactUsFragment">
+
+        <fragment
+            android:id="@+id/contactUsFragment"
+            android:name="com.example.test.ui.ContactUsFragment"
+            android:label="Contact Us"
+            tools:layout="@layout/fragment_contact_us" />
+
+        <!-- Add more destinations for Contact Us tab if needed -->
+    </navigation>
+
+    <!-- Rate Us navigation graph -->
+    <navigation
+        android:id="@+id/navigation_rate_us"
+        app:startDestination="@id/rateUsFragment">
+
+        <fragment
+            android:id="@+id/rateUsFragment"
+            android:name="com.example.test.ui.RateUsFragment"
+            android:label="Rate Us"
+            tools:layout="@layout/fragment_rate_us" />
+
+        <!-- Add more destinations for Rate Us tab if needed -->
+    </navigation>
+
+</navigation>

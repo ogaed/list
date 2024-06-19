@@ -5,15 +5,21 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement.Absolute.Center
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.test.ui.theme.TestTheme
@@ -25,25 +31,53 @@ class CategoryDetailsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            TestTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     val category = intent.getStringExtra("category") ?: ""
                     CategoryDetailsScreen(category, innerPadding)
-                }
+
             }
         }
     }
 }
 
+val categoryImage = mapOf(
+    "Business Tourism and culture" to R.drawable.business_image,
+    "Adventure Tourism and culture" to R.drawable.adventure,
+    "Sports Tourism and Culture" to R.drawable.sports,
+    "Heritage Tourism and Culture" to R.drawable.heritage,
+    "Conferencing Tourism and Culture" to R.drawable.conference,
+    "Medical Tourism and Culture" to R.drawable.medical,
+    "Eco-Tourism and Culture" to R.drawable.eco,
+    "Matatu Tourism and Culture" to R.drawable.matatu,
+    "Agricultural Tourism and Culture" to R.drawable.agric
+    // Add more categories and corresponding drawable resources as needed
+)
+
+
 @Composable
 fun CategoryDetailsScreen(category: String, innerPadding: PaddingValues) {
     var attractions by remember { mutableStateOf<List<Attraction>>(emptyList()) }
 
-    LaunchedEffect(key1 = true) {
+    LaunchedEffect(key1 = category) {
         attractions = loadAttractionsFromJson().filter { it.category == category }
     }
 
     Column(modifier = Modifier.padding(innerPadding).verticalScroll(rememberScrollState())) {
+
+        Image(
+            painter = painterResource(id = categoryImage[category] ?: R.drawable.background_image), // Default image if category image not found
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp),
+            contentScale = ContentScale.Crop
+        )
+        Text(
+            text = category,
+            style = MaterialTheme.typography.headlineLarge,
+            color = Color.Black,
+            modifier = Modifier.padding(50.dp)
+        )
         attractions.forEach { attraction ->
             DetailCard(attraction = attraction)
         }
@@ -56,13 +90,20 @@ fun DetailCard(attraction: Attraction) {
     val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
 
-
     Card(
         modifier = Modifier.padding(8.dp).fillMaxWidth(),
         elevation = CardDefaults.cardElevation(8.dp),
         onClick = { showDialog = true }
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+            Image(
+                painter = painterResource(id = categoryImage[attraction.category] ?: R.drawable.background_image), // Default image if category image not found
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
+                contentScale = ContentScale.Crop
+            )
             Text(
                 text = "${attraction.first_name} ${attraction.last_name}",
                 style = MaterialTheme.typography.headlineMedium,
@@ -85,17 +126,19 @@ fun DetailCard(attraction: Attraction) {
             )
             Text(
                 text = "View More",
-                style = MaterialTheme.typography.bodyMedium.copy(color = androidx.compose.ui.graphics.Color(0xFF3366CC)), // Example color code
-
-//                style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colors.primary),
+                style = MaterialTheme.typography.bodyMedium.copy(color = Color(0xFF3366CC)), // Example color code
                 modifier = Modifier
                     .align(Alignment.End)
-                    
+                    .clickable {
+                        showDialog = true
+                    }
+                    .padding(top = 8.dp)
             )
         }
     }
 
     if (showDialog) {
+        // Assuming AttractionDetailsPopup is a composable function that shows details of the attraction
         AttractionDetailsPopup(
             attraction = attraction,
             onDismiss = { showDialog = false }
@@ -103,75 +146,93 @@ fun DetailCard(attraction: Attraction) {
     }
 }
 
+
 @Composable
 fun AttractionDetailsPopup(attraction: Attraction, onDismiss: () -> Unit) {
     val context = LocalContext.current
     Dialog(
         onDismissRequest = { onDismiss() }
     ) {
-        Column(
+        Card(
             modifier = Modifier.padding(16.dp)
         ) {
-            Text(
-                text = "${attraction.first_name} ${attraction.last_name}",
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(bottom = 8.dp)
+            Column(
+                modifier = Modifier.padding(16.dp)
             )
-            Text(
-                text = attraction.location,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            Text(
-                text = attraction.expertise,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            Text(
-                text = attraction.experience,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            Text(
-                text = attraction.bio,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            Text(
-                text = attraction.average_rating.toString(),
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            Text(
-                text = attraction.phone_number,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            Text(
-                text = attraction.languages,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            Text(
-                text = attraction.email,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            Row {
-                Button(onClick = {
-                    val intent = Intent(Intent.ACTION_DIAL)
-                    intent.data = Uri.parse("tel:${attraction.phone_number}")
-                    context.startActivity(intent)
-                }) {
-                    Text("Call")
-                }
-                Button(onClick = {
-                    val intent = Intent(Intent.ACTION_SENDTO)
-                    intent.data = Uri.parse("smsto:${attraction.phone_number}")
-                    intent.putExtra("sms_body", "Hello ${attraction.first_name}, ")
-                    context.startActivity(intent)
-                }) {
-                    Text("Message")
+
+            {
+                Image(
+                    painter = painterResource(id = R.drawable.background_image), // Replace with your default image resource
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp), // Adjust height as needed
+                    contentScale = ContentScale.Crop // Adjust content scale as needed
+                )
+                Text(
+                    text = "${attraction.first_name} ${attraction.last_name}",
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Text(
+                    text = "Bio: ${attraction.bio}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Text(
+                    text = "Average Rating: ${attraction.average_rating}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Text(
+                    text = "Location: ${attraction.location}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Text(
+                    text = "Expertise: ${attraction.expertise}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Text(
+                    text = "Experience: ${attraction.experience}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Text(
+                    text = "Languages: ${attraction.languages}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Text(
+                    text = "Phone Number: ${attraction.phone_number}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Text(
+                    text = "Email: ${attraction.email}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Button(onClick = {
+                        val intent = Intent(Intent.ACTION_DIAL)
+                        intent.data = Uri.parse("tel:${attraction.phone_number}")
+                        context.startActivity(intent)
+                    }) {
+                        Text("Call")
+                    }
+                    Button(onClick = {
+                        val intent = Intent(Intent.ACTION_SENDTO)
+                        intent.data = Uri.parse("smsto:${attraction.phone_number}")
+                        intent.putExtra("sms_body", "Hello ${attraction.first_name}, ")
+                        context.startActivity(intent)
+                    }) {
+                        Text("Message")
+                    }
                 }
             }
         }

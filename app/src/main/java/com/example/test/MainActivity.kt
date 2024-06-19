@@ -23,34 +23,81 @@ import androidx.compose.ui.unit.dp
 import com.example.test.ui.theme.TestTheme
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.background
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 
 
-    class MainActivity : ComponentActivity() {
-        override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
-            setContent {
-                TestTheme {
-                    Scaffold(modifier = Modifier.fillMaxSize()) {
-                        val attractions by remember { mutableStateOf(loadAttractionsFromJson()) }
-                        Column(
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp, vertical = 16.dp)
-                                .verticalScroll(rememberScrollState())
-                        ) {
-                            WelcomeHeader()
-                            DynamicCategoryCards(attractions = attractions)
-                        }
+//val backgroundImage = painterResource(id = R.drawable.background_image)
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            // Use Box to add background image and fixed position
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Red) // Replace Color.Red with your desired color
+            ) {
+                // Background Image
+                Image(
+                    painter = painterResource(id = R.drawable.background_image),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.FillBounds
+                )
+
+                // Content Scaffold
+                Scaffold(modifier = Modifier.fillMaxSize()) {
+                    val attractions by remember { mutableStateOf(loadAttractionsFromJson()) }
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp, vertical = 16.dp)
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        LogoHeader()
+                        WelcomeHeader()
+                        DynamicCategoryCards(attractions = attractions)
                     }
                 }
             }
         }
     }
+}
+
+    @Composable
+    fun LogoHeader() {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(16.dp)
+        ) {
+            // Add your logo image here
+            Image(
+                painter = painterResource(id = R.drawable.logo),
+                contentDescription = null,
+                modifier = Modifier.size(100.dp) // Adjust size as needed
+            )
+//            Spacer(modifier = Modifier.width(16.dp))
+//            Text(
+//                text = "Welcome to Nairobi City Tourism and Culture",
+//                style = MaterialTheme.typography.headlineLarge,
+//            )
+        }
+    }
+
 
 
 @Composable
 fun WelcomeHeader() {
     Text(
-        text = "Welcome to Nairobi City Tourism and Culture",
+        text = "Welcome to Nairobi City Tourism and Culture Manouvers",
         style = MaterialTheme.typography.headlineLarge,
         modifier = Modifier.padding(16.dp)
     )
@@ -68,6 +115,19 @@ fun DynamicCategoryCards(attractions: List<Attraction>, modifier: Modifier = Mod
     }
 }
 
+val categoryImages = mapOf(
+   "Business Tourism and culture" to R.drawable.business_image,
+    "Adventure Tourism and culture" to R.drawable.adventure,
+    "Sports Tourism and Culture" to R.drawable.sports,
+    "Heritage Tourism and Culture" to R.drawable.heritage,
+    "Conferencing Tourism and Culture" to R.drawable.conference,
+    "Medical Tourism and Culture" to R.drawable.medical,
+    "Eco-Tourism and Culture" to R.drawable.eco,
+    "Matatu Tourism and Culture" to R.drawable.matatu,
+    "Agricultural Tourism and Culture" to R.drawable.agric,
+    // Add more categories as needed
+)
+
 @Composable
 fun AnimatedCategoryCard(category: String, attractions: List<Attraction>) {
     val context = LocalContext.current
@@ -81,26 +141,28 @@ fun AnimatedCategoryCard(category: String, attractions: List<Attraction>) {
             .clickable {
                 expanded = !expanded // Toggle expanded state
             },
-        elevation = CardDefaults.cardElevation(8.dp)
+        elevation = CardDefaults.cardElevation(48.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+            // Display category image
+            categoryImages[category]?.let { image ->
+                Image(
+                    painter = painterResource(id = image),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp) // Adjust height as needed
+                )
+            }
             Text(
                 text = category,
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-            Text(
-                text = attractionsInCategory.joinToString(separator = "\n\n") { it.experience },
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(bottom = 8.dp),
-                maxLines = if (expanded) Int.MAX_VALUE else 2,
-                overflow = TextOverflow.Ellipsis
-            )
+
             Text(
                 text = "View More",
-                style = MaterialTheme.typography.bodyMedium.copy(color = androidx.compose.ui.graphics.Color(0xFF3366CC)), // Example color code
-
-//                style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colors.primary),
+                style = MaterialTheme.typography.bodyMedium.copy(color = Color(0xFF3366CC)), // Example color code
                 modifier = Modifier
                     .align(Alignment.End)
                     .clickable {
@@ -114,6 +176,7 @@ fun AnimatedCategoryCard(category: String, attractions: List<Attraction>) {
         }
     }
 }
+
 
 private fun loadAttractionsFromJson(): List<Attraction> {
     val jsonString = """
